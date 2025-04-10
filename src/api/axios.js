@@ -10,10 +10,17 @@ const api = axios.create({
 
 api.interceptors.request.use((config) => {
     const token = localStorage.getItem("access");
-    if (token) {
-        config.headerrs.Authorization = `Bearer ${token}`;
+  
+    // Don't add token for registration or login routes
+    if (
+      token &&
+      !config.url.includes("/auth/users/") &&
+      !config.url.includes("/auth/jwt/create/")
+    ) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
+  
     return config;
-})
+  });
 
 export default api;
