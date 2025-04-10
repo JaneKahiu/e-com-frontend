@@ -27,7 +27,7 @@ const Register = () => {
       return;
     }
 
-    const dataToSend = { ...formData }; // ✅ Send all required fields
+    const dataToSend = { ...formData }; 
 
     try {
       const response = await api.post("/auth/users/", dataToSend);

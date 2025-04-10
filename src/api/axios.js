@@ -11,7 +11,7 @@ const api = axios.create({
 api.interceptors.request.use((config) => {
     const token = localStorage.getItem("access");
   
-    // Don't add token for registration or login routes
+   
     if (
       token &&
       !config.url.includes("/auth/users/") &&
