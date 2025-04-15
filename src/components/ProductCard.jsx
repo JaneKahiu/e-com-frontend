@@ -15,7 +15,7 @@ const ProductCard = ({ product }) => {
         <h2 className="text-lg font-semibold hover:underline">{product.name}</h2>
         <p className="text-sm text-gray-500">{product.description}</p>
 
-        {/* ✅ Fixed Price Display */}
+    
         {product.price && (
           <p className="text-primary font-bold mt-2">
             KES {product.price}
