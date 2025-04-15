@@ -9,11 +9,16 @@ const Products = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     setLoading(true);
-    api.get(`products/?page=${currentPage}`)
+    setError(null);
+    
+    // Updated endpoint to match the Django URL structure
+    api.get(`product/products/?page=${currentPage}`)
       .then((res) => {
+        console.log("API Response:", res.data);
         setProducts(res.data.results);
         setPagination({
           next: res.data.next,
@@ -22,14 +27,15 @@ const Products = () => {
         setLoading(false);
       })
       .catch((err) => {
-        console.error(err);
+        console.error("API Error:", err);
+        setError("Failed to load products. Please try again later.");
         setLoading(false);
       });
   }, [currentPage]);
 
-  const filteredProducts = products.filter((p) =>
-    p.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredProducts = products && products.length > 0 
+    ? products.filter((p) => p.name.toLowerCase().includes(searchTerm.toLowerCase()))
+    : [];
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -38,22 +44,25 @@ const Products = () => {
   return (
     <div className="max-w-7xl mx-auto p-6">
       {/* Search bar with icon */}
-    <div className="flex items-center mb-6">
-      <div className="relative w-full">
-        {/* Search Icon */}
-        <FiSearch className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-400 text-xl" />
-        
-        {/* Input */}
-        <input
-          type="text"
-          placeholder="Search products..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-        />
+      <div className="flex items-center mb-6">
+        <div className="relative w-full">
+          <FiSearch className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-400 text-xl" />
+          <input
+            type="text"
+            placeholder="Search products..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+        </div>
       </div>
-    </div>
 
+      {/* Error message */}
+      {error && (
+        <div className="text-center text-red-500 font-semibold text-lg mb-6">
+          {error}
+        </div>
+      )}
 
       {/* Product cards */}
       {loading ? (
@@ -70,7 +79,7 @@ const Products = () => {
             </div>
           ) : (
             <div className="text-center text-gray-500 mt-10">
-              No products found.
+              {!error && "No products found."}
             </div>
           )}
         </>
@@ -85,7 +94,7 @@ const Products = () => {
               : 'bg-gray-300 text-gray-600 cursor-not-allowed'
           }`}
           disabled={!pagination.previous}
-          onClick={() => handlePageChange(currentPage - 1)}
+          onClick={() => pagination.previous && handlePageChange(currentPage - 1)}
         >
           Previous
         </button>
@@ -99,7 +108,7 @@ const Products = () => {
               : 'bg-gray-300 text-gray-600 cursor-not-allowed'
           }`}
           disabled={!pagination.next}
-          onClick={() => handlePageChange(currentPage + 1)}
+          onClick={() => pagination.next && handlePageChange(currentPage + 1)}
         >
           Next
         </button>
