@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import api from "../api/axios";
 import ProductCard from '../components/ProductCard';
 import { FiSearch } from 'react-icons/fi';
+import CategorySidebar from '../components/CategorySidebar';
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -14,11 +15,8 @@ const Products = () => {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    
-    // Updated endpoint to match the Django URL structure
     api.get(`product/products/?page=${currentPage}`)
       .then((res) => {
-        console.log("API Response:", res.data);
         setProducts(res.data.results);
         setPagination({
           next: res.data.next,
@@ -33,17 +31,17 @@ const Products = () => {
       });
   }, [currentPage]);
 
-  const filteredProducts = products && products.length > 0 
-    ? products.filter((p) => p.name.toLowerCase().includes(searchTerm.toLowerCase()))
-    : [];
+  const filteredProducts = products?.filter((p) =>
+    p.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
-      {/* Search bar with icon */}
+    <div className="max-w-7xl mx-auto px-6 py-6">
+      {/* Search bar */}
       <div className="flex items-center mb-6">
         <div className="relative w-full">
           <FiSearch className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-400 text-xl" />
@@ -57,61 +55,70 @@ const Products = () => {
         </div>
       </div>
 
-      {/* Error message */}
-      {error && (
-        <div className="text-center text-red-500 font-semibold text-lg mb-6">
-          {error}
+      {/* Layout with Sidebar + Products */}
+      <div className="flex gap-6">
+        {/* Sidebar on the left */}
+        <div className="w-1/5">
+          <CategorySidebar />
         </div>
-      )}
 
-      {/* Product cards */}
-      {loading ? (
-        <div className="text-center text-blue-500 font-semibold text-lg">
-          Loading products...
-        </div>
-      ) : (
-        <>
-          {filteredProducts.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {filteredProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center text-gray-500 mt-10">
-              {!error && "No products found."}
+        {/* Product Grid Section */}
+        <div className="w-4/5">
+          {error && (
+            <div className="text-center text-red-500 font-semibold text-lg mb-6">
+              {error}
             </div>
           )}
-        </>
-      )}
 
-      {/* Pagination controls */}
-      <div className="flex justify-between items-center mt-10">
-        <button
-          className={`px-4 py-2 rounded-lg ${
-            pagination.previous
-              ? 'bg-blue-500 text-white hover:bg-blue-600'
-              : 'bg-gray-300 text-gray-600 cursor-not-allowed'
-          }`}
-          disabled={!pagination.previous}
-          onClick={() => pagination.previous && handlePageChange(currentPage - 1)}
-        >
-          Previous
-        </button>
+          {loading ? (
+            <div className="text-center text-blue-500 font-semibold text-lg">
+              Loading products...
+            </div>
+          ) : (
+            <>
+              {filteredProducts.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {filteredProducts.map((product) => (
+                    <ProductCard key={product.id} product={product} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center text-gray-500 mt-10">
+                  {!error && "No products found."}
+                </div>
+              )}
+            </>
+          )}
 
-        <span className="text-sm text-gray-500">Page {currentPage}</span>
+          {/* Pagination */}
+          <div className="flex justify-between items-center mt-10">
+            <button
+              className={`px-4 py-2 rounded-lg ${
+                pagination.previous
+                  ? 'bg-blue-500 text-white hover:bg-blue-600'
+                  : 'bg-gray-300 text-gray-600 cursor-not-allowed'
+              }`}
+              disabled={!pagination.previous}
+              onClick={() => pagination.previous && handlePageChange(currentPage - 1)}
+            >
+              Previous
+            </button>
 
-        <button
-          className={`px-4 py-2 rounded-lg ${
-            pagination.next
-              ? 'bg-blue-500 text-white hover:bg-blue-600'
-              : 'bg-gray-300 text-gray-600 cursor-not-allowed'
-          }`}
-          disabled={!pagination.next}
-          onClick={() => pagination.next && handlePageChange(currentPage + 1)}
-        >
-          Next
-        </button>
+            <span className="text-sm text-gray-500">Page {currentPage}</span>
+
+            <button
+              className={`px-4 py-2 rounded-lg ${
+                pagination.next
+                  ? 'bg-blue-500 text-white hover:bg-blue-600'
+                  : 'bg-gray-300 text-gray-600 cursor-not-allowed'
+              }`}
+              disabled={!pagination.next}
+              onClick={() => pagination.next && handlePageChange(currentPage + 1)}
+            >
+              Next
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
