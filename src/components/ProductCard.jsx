@@ -1,10 +1,7 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { CartContext } from '../context/CartContext.jsx';
 
-const ProductCard = ({ product }) => {
-  const { addToCart } = useContext(CartContext);
-
+const ProductCard = ({ product, onAddToCart }) => {
   return (
     <div className="border p-4 rounded-lg shadow hover:shadow-lg transition flex flex-col justify-between">
       <Link to={`/product/${product.slug}`}>
@@ -24,7 +21,7 @@ const ProductCard = ({ product }) => {
       </Link>
 
       <button
-        onClick={() => addToCart(product)}
+        onClick={() => onAddToCart(product)} 
         className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
       >
         Add to Cart

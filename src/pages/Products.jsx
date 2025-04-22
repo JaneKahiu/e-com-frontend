@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from "../api/axios";
 import ProductCard from '../components/ProductCard';
 import { FiSearch } from 'react-icons/fi';
 import CategorySidebar from '../components/CategorySidebar';
+import { CartContext } from '../context/CartContext';
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -11,6 +13,9 @@ const Products = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const { addToCart } = useContext(CartContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setLoading(true);
@@ -30,6 +35,13 @@ const Products = () => {
         setLoading(false);
       });
   }, [currentPage]);
+
+  const handleAddToCart = (product) => {
+    const success = addToCart(product);
+    if (!success) {
+      navigate("/login");
+    }
+  };
 
   const filteredProducts = products?.filter((p) =>
     p.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -79,7 +91,11 @@ const Products = () => {
               {filteredProducts.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                   {filteredProducts.map((product) => (
-                    <ProductCard key={product.id} product={product} />
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      onAddToCart={handleAddToCart} // ✅ pass down
+                    />
                   ))}
                 </div>
               ) : (
