@@ -6,7 +6,7 @@ export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
 
   const addToCart = (product) => {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem('access');
 
     if (!token) {
       return false; // not authenticated

@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
 import api from "../api/axios";
 import ProductCard from '../components/ProductCard';
 import { FiSearch } from 'react-icons/fi';
 import CategorySidebar from '../components/CategorySidebar';
-import { CartContext } from '../context/CartContext';
+import { CartContext } from "../context/CartContext";
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-hot-toast';
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -13,9 +14,18 @@ const Products = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
+  
   const { addToCart } = useContext(CartContext);
   const navigate = useNavigate();
+
+  const handleAddToCart = (product) => {
+    const success = addToCart(product);
+    if (success) {
+      toast.success(`${product.name} added to cart!`);
+    } else {
+      navigate("/login");
+    }
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -36,20 +46,9 @@ const Products = () => {
       });
   }, [currentPage]);
 
-  const handleAddToCart = (product) => {
-    const success = addToCart(product);
-    if (!success) {
-      navigate("/login");
-    }
-  };
-
   const filteredProducts = products?.filter((p) =>
     p.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-6">
@@ -67,14 +66,13 @@ const Products = () => {
         </div>
       </div>
 
-      {/* Layout with Sidebar + Products */}
       <div className="flex gap-6">
-        {/* Sidebar on the left */}
+        {/* Sidebar */}
         <div className="w-1/5">
           <CategorySidebar />
         </div>
 
-        {/* Product Grid Section */}
+        {/* Product List */}
         <div className="w-4/5">
           {error && (
             <div className="text-center text-red-500 font-semibold text-lg mb-6">
@@ -94,7 +92,7 @@ const Products = () => {
                     <ProductCard
                       key={product.id}
                       product={product}
-                      onAddToCart={handleAddToCart} // ✅ pass down
+                      onAddToCart={handleAddToCart} // ✅ Pass here
                     />
                   ))}
                 </div>
@@ -115,7 +113,7 @@ const Products = () => {
                   : 'bg-gray-300 text-gray-600 cursor-not-allowed'
               }`}
               disabled={!pagination.previous}
-              onClick={() => pagination.previous && handlePageChange(currentPage - 1)}
+              onClick={() => pagination.previous && setCurrentPage(currentPage - 1)}
             >
               Previous
             </button>
@@ -129,7 +127,7 @@ const Products = () => {
                   : 'bg-gray-300 text-gray-600 cursor-not-allowed'
               }`}
               disabled={!pagination.next}
-              onClick={() => pagination.next && handlePageChange(currentPage + 1)}
+              onClick={() => pagination.next && setCurrentPage(currentPage + 1)}
             >
               Next
             </button>

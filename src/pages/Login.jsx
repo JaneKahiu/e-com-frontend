@@ -16,7 +16,7 @@ const Login = () => {
       const response = await api.post("/auth/jwt/create/", formData);
       localStorage.setItem("access", response.data.access);
       localStorage.setItem("refresh", response.data.refresh);
-      navigate("/dashboard");
+      navigate("/");
     } catch (error) {
       console.error("Login failed:", error.response?.data || error.message);
     }

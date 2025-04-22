@@ -1,7 +1,15 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 const ProductCard = ({ product, onAddToCart }) => {
+  const handleClick = () => {
+    const added = onAddToCart(product);
+    if (added) {
+      toast.success(`${product.name} added to cart!`);
+    }
+  };
+
   return (
     <div className="border p-4 rounded-lg shadow hover:shadow-lg transition flex flex-col justify-between">
       <Link to={`/product/${product.slug}`}>
@@ -21,7 +29,7 @@ const ProductCard = ({ product, onAddToCart }) => {
       </Link>
 
       <button
-        onClick={() => onAddToCart(product)} 
+        onClick={handleClick}
         className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
       >
         Add to Cart
